@@ -1,0 +1,126 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node{
+    int val;
+    struct node*right;
+    struct node*left;
+    int height;
+
+};
+int getHeight(struct node*root){
+    if(root==NULL){
+        return 0;
+    }
+    else
+    return root->height;
+}
+
+int max(int a,int b){
+    return (a>b)? a : b;
+}
+
+struct node* create(int val){
+    struct node*newNode=(struct node*)malloc(sizeof(struct node));
+    newNode->val=val;
+    newNode->right=NULL;
+    newNode->left=NULL;
+    int height=1;
+    return newNode;
+}
+
+struct node*rightRotate(struct node*root){
+       struct node*newRoot=root->left;
+       struct node*temp=newRoot->right;
+
+       newRoot->right=root;
+       root->left=temp;
+
+       newRoot->height=max(getHeight(newRoot->left),getHeight(newRoot->right))+1;
+       root->height=max(getHeight(root->left),getHeight(root->right))+1;
+
+       return newRoot;
+}
+
+struct node*leftRotate(struct node*root){
+       struct node*newRoot=root->right;
+       struct node*temp=newRoot->left;
+
+       newRoot->left=root;
+       root->right=temp;
+
+       newRoot->height=max(getHeight(newRoot->left),getHeight(newRoot->right))+1;
+       root->height=max(getHeight(root->left),getHeight(root->right))+1;
+
+       return newRoot;
+}
+
+int getBalance(struct node*root){
+    if(root==NULL){
+        return 0;
+    }
+    return getHeight(root->left)-getHeight(root->right);
+}
+
+struct node* insert(struct node*root,int val){
+    /////
+    if(root==NULL){
+        return (create(val));
+    }
+
+    if(val>root->val){
+        root->right=insert(root->right,val);
+    }
+    else if(val<root->val){
+        root->left = insert(root->left,val);
+    }
+    else
+    return root;
+
+    /////
+    root->height=1+max(getHeight(root->left),getHeight(root->right));
+
+
+    int balance=getBalance(root);
+
+    if(balance>1 && val<root->left->val){
+        return rightRotate(root);
+    }
+    if(balance<-1 && val>root->right->val){
+        return leftRotate(root);
+    }
+    if(balance>1 && val>root->left->val){
+        return rightRotate(root);
+    }
+    if(balance<-1 && val<root->right->val){
+        return leftRotate(root);
+    }
+
+    return root;
+
+}
+
+void preorder(struct node*root){
+    if(root!=NULL){
+    printf("%d ",root->val);
+    preorder(root->left);
+    preorder(root->right);
+    }
+}
+
+int main(){
+  struct node*root=NULL;
+
+  root = insert(root, 10);
+  root = insert(root, 20);
+  root = insert(root, 30);
+  root = insert(root, 40);
+  root = insert(root, 50);
+  root = insert(root, 25);
+
+  printf("avl tree is \n");
+  preorder(root);
+
+
+    return 0;
+}
